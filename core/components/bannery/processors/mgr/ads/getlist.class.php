@@ -9,13 +9,13 @@ class AdGetListProcessor extends modObjectGetListProcessor {
 	function prepareQueryBeforeCount(xPDOQuery $c) {
 		// Filter by position
 		if ($position = $this->getProperty('position')) {
-			$mode = $this->getProperty('mode','include');
+			/*$mode = $this->getProperty('mode','include');
 
 			$q = $this->modx->newQuery('byAdPosition');
 
 			$q->select('ad');
 			$q->where(array('position' => $position));
-			//$q->sortby('idx ASC, id', 'ASC');
+			$q->sortby('idx ASC, id', 'ASC');
 			if ($q->prepare() && $q->stmt->execute()) {
 				$ads = array_unique($q->stmt->fetchAll(PDO::FETCH_COLUMN));
 			}
@@ -26,13 +26,18 @@ class AdGetListProcessor extends modObjectGetListProcessor {
 				else {
 					$c->where(array('id:IN' => $ads));
 				}
-			}
+			}*/
+
+			$c->innerJoin('byAdPosition', 'byAdPosition', array('`byAdPosition`.`ad` = `byAd`.`id`'));
+			$c->where(array("byAdPosition.position"=>$position));
+			$c->sortby("byAdPosition.idx", "ASC");
 		}
 		// Filter by search query
 		if ($query = $this->getProperty('query')) {
 			$c->where(array('name:LIKE' => "%$query%", 'OR:description:LIKE' => "%$query%"));
 		}
-		
+
+		//$c->sortby("idx ASC, id", "ASC");
 		return $c;
 	}
 
